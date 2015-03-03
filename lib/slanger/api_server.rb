@@ -18,6 +18,11 @@ module Slanger
     # Respond with HTTP 401 Unauthorized if request cannot be authenticated.
     error(Signature::AuthenticationError) { |c| halt 401, "401 UNAUTHORIZED\n" }
 
+    get '/ping' do
+      status 200
+      return 'pong'
+    end
+
     post '/apps/:app_id/events' do
       authenticate
 
