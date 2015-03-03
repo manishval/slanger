@@ -29,6 +29,12 @@ module Slanger
       def send_client_message msg
         from(msg['channel']).try :send_client_message, msg
       end
+
+      def occupied
+        # TODO
+        # Return all channels that have connections
+        {}
+      end
     end
 
     def initialize(attrs)

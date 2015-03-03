@@ -32,6 +32,33 @@ module Slanger
       return {}.to_json
     end
 
+    get '/apps/:app_id/channels' do
+      status 200
+      return { channels: Channel.occupied }.to_json
+    end
+
+    get '/apps/:app_id/channels/:channel_id' do
+      channel = Channel.from(params[:channel_id])
+      status 200
+
+      if channel.ids.present?
+        return { user_count: channel.ids.size }.to_json
+      else
+        return { user_count: '0' }.to_json
+      end
+    end
+
+    get '/apps/:app_id/channels/:channel_id/users' do
+      channel = Channel.from(params[:channel_id])
+      status 200
+
+      if channel.subscribers.present?
+        return { users: channel.subscribers }.to_json
+      else
+        return { users: nil }.to_json
+      end
+    end
+
     post '/apps/:app_id/channels/:channel_id/events' do
       authenticate
 
