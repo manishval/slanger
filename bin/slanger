@@ -91,6 +91,8 @@ end
 
 STDOUT.sync = true
 
+descriptor_table_size = EM.set_descriptor_table_size( 60000 )
+
 EM.epoll
 EM.kqueue
 
@@ -125,4 +127,6 @@ EM.run do
 
   puts "Slanger API server listening on port #{options[:api_port]}"
   puts "Slanger WebSocket server listening on port #{options[:websocket_port]}"
+
+  puts "EventMachine descriptor table size: #{descriptor_table_size}"
 end
