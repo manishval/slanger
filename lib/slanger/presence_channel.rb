@@ -53,6 +53,9 @@ module Slanger
         end
       end
 
+      # Send web hook
+      Slanger::Webhook.post name: 'member_added', channel: channel_id
+
       public_subscription_id
     end
 
@@ -67,10 +70,15 @@ module Slanger
     def unsubscribe(public_subscription_id)
       # Unsubcribe from EM::Channel
       channel.unsubscribe(internal_subscription_table.delete(public_subscription_id)) # if internal_subscription_table[public_subscription_id]
+
       # Remove subscription data from Redis
       roster_remove public_subscription_id
+
       # Notify all instances
       publish_connection_notification subscription_id: public_subscription_id, online: false, channel: channel_id
+
+      # Send web hook
+      Slanger::Webhook.post name: 'member_removed', channel: channel_id
     end
 
     private
@@ -121,7 +129,6 @@ module Slanger
         # is already present in the subscriptions hash, i.e. multiple browser windows open.
         unless subscriptions.has_value? message['channel_data']
           push payload('pusher_internal:member_added', message['channel_data'])
-          Slanger::Webhook.post name: 'member_added', channel: channel_id
         end
         subscriptions[message['subscription_id']] = message['channel_data']
       else
@@ -130,7 +137,6 @@ module Slanger
         subscriber = subscriptions.delete message['subscription_id']
         if subscriber && !subscriptions.has_value?(subscriber)
           push payload('pusher_internal:member_removed', { user_id: subscriber['user_id'] })
-          Slanger::Webhook.post name: 'member_removed', channel: channel_id
         end
       end
     end
